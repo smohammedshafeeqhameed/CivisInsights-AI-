@@ -9,6 +9,7 @@ import {
   BarChart3,
   Settings,
   LogOut,
+  Database,
 } from 'lucide-react';
 
 import {
@@ -83,6 +84,18 @@ export default function DashboardLayout({
                 <Link href="/dashboard">
                   <LayoutDashboard />
                   Dashboard
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === '/dashboard/data-hub'}
+                tooltip={{ children: 'Data Hub' }}
+              >
+                <Link href="/dashboard/data-hub">
+                  <Database />
+                  Data Hub
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
