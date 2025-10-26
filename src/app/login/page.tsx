@@ -2,8 +2,9 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { useAuth, useUser } from '@/firebase';
+import { GoogleAuthProvider, signInWithPopup, User } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { useAuth, useUser, useFirestore } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { SealOfMaharashtra } from '@/components/icons';
 
@@ -35,22 +36,43 @@ function GoogleIcon() {
 
 export default function LoginPage() {
   const auth = useAuth();
+  const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
 
   useEffect(() => {
-    // If user is already logged in, redirect to dashboard.
-    // This is a fallback, main logic is in /src/app/page.tsx
     if (!isUserLoading && user) {
       router.replace('/dashboard');
     }
   }, [user, isUserLoading, router]);
 
+  const updateUserProfile = async (user: User) => {
+    const userRef = doc(firestore, 'users', user.uid);
+    const { displayName, email, photoURL } = user;
+    
+    // Deconstruct name into first and last
+    const nameParts = displayName?.split(' ') || [];
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    const userData = {
+      id: user.uid,
+      googleId: user.providerData.find(p => p.providerId === 'google.com')?.uid || user.uid,
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+      profilePicture: photoURL,
+    };
+    // Use setDoc with merge to create or update the user document.
+    await setDoc(userRef, userData, { merge: true });
+  }
+
   const handleSignIn = async () => {
     if (auth) {
       try {
-        await signInWithPopup(auth, provider);
-        // On successful sign-in, the useEffect hook will trigger the redirect.
+        const result = await signInWithPopup(auth, provider);
+        await updateUserProfile(result.user);
+        router.push('/dashboard');
       } catch (error: any) {
         if (error.code !== 'auth/popup-closed-by-user') {
           console.error('Error signing in with Google:', error);
@@ -59,7 +81,6 @@ export default function LoginPage() {
     }
   };
 
-  // While checking auth status or if user is already logged in, show a loading state.
   if (isUserLoading || user) {
     return (
       <div className="flex h-screen w-screen items-center justify-center">

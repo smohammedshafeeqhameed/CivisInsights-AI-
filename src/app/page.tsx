@@ -10,12 +10,10 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    // We want to wait until the user's auth status is fully determined.
     if (isUserLoading) {
-      return; // Wait...
+      return; 
     }
 
-    // Once the status is known, redirect accordingly.
     if (user) {
       router.replace('/dashboard');
     } else {
@@ -23,6 +21,5 @@ export default function Home() {
     }
   }, [user, isUserLoading, router]);
 
-  // Show a splash/loading screen while the auth check is happening.
   return <SplashScreen />;
 }
