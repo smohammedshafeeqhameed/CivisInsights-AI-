@@ -11,11 +11,13 @@ import { StatCard } from '@/components/dashboard/stat-card';
 import { RecentIssues } from '@/components/dashboard/recent-issues';
 import { DemandPrediction } from '@/components/dashboard/demand-prediction';
 import { GovernanceInsights } from '@/components/dashboard/governance-insights';
-import { issues } from '@/lib/data';
+import { useIssues } from '@/hooks/use-issues';
 
 export default function DashboardPage() {
+  const { issues } = useIssues();
+
   const newIssues = issues.filter((issue) => issue.status === 'New').length;
-  const resolvedToday = issues.filter(
+  const resolvedIssues = issues.filter(
     (issue) => issue.status === 'Resolved'
   ).length;
   const pendingReview = issues.filter(
@@ -33,7 +35,7 @@ export default function DashboardPage() {
         />
         <StatCard
           title="Resolved Issues"
-          value={resolvedToday}
+          value={resolvedIssues}
           icon={CheckCircle2}
         />
         <StatCard

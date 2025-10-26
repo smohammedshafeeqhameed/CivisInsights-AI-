@@ -4,6 +4,7 @@
  * @fileOverview Analyzes a citizen-reported issue to assign a priority score and suggest the appropriate department.
  *
  * - prioritizeCitizenIssue - A function that analyzes and prioritizes a citizen issue.
+ * - PrioritizeCitizenIssueInputSchema - The Zod schema for the input.
  * - PrioritizeCitizenIssueInput - The input type for the prioritizeCitizenIssue function.
  * - PrioritizeCitizenIssueOutput - The return type for the prioritizeCitizenIssue function.
  */
@@ -11,7 +12,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const PrioritizeCitizenIssueInputSchema = z.object({
+export const PrioritizeCitizenIssueInputSchema = z.object({
   issueReport: z
     .string()
     .describe('The detailed report of the issue submitted by a citizen.'),

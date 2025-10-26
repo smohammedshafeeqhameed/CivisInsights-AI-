@@ -7,15 +7,15 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import {
   generateGovernanceInsights,
-  GenerateGovernanceInsightsInput,
+  GenerateGovernanceInsightsInputSchema,
 } from './generate-governance-insights';
 import {
   predictServiceDemand,
-  PredictServiceDemandInput,
+  PredictServiceDemandInputSchema,
 } from './predict-service-demand';
 import {
   prioritizeCitizenIssue,
-  PrioritizeCitizenIssueInput,
+  PrioritizeCitizenIssueInputSchema,
 } from './prioritize-citizen-issue';
 
 const getInsightsTool = ai.defineTool(
@@ -23,7 +23,7 @@ const getInsightsTool = ai.defineTool(
     name: 'generateGovernanceInsights',
     description:
       'Generates proactive governance insights from citizen feedback and historical data.',
-    inputSchema: GenerateGovernanceInsightsInput,
+    inputSchema: GenerateGovernanceInsightsInputSchema,
     outputSchema: z.any(),
   },
   async (input) => generateGovernanceInsights(input)
@@ -34,7 +34,7 @@ const predictDemandTool = ai.defineTool(
     name: 'predictServiceDemand',
     description:
       'Predicts future service demand based on historical data and current issues.',
-    inputSchema: PredictServiceDemandInput,
+    inputSchema: PredictServiceDemandInputSchema,
     outputSchema: z.any(),
   },
   async (input) => predictServiceDemand(input)
@@ -44,7 +44,7 @@ const prioritizeIssueTool = ai.defineTool(
   {
     name: 'prioritizeCitizenIssue',
     description: 'Analyzes and prioritizes a single citizen issue.',
-    inputSchema: PrioritizeCitizenIssueInput,
+    inputSchema: PrioritizeCitizenIssueInputSchema,
     outputSchema: z.any(),
   },
   async (input) => prioritizeCitizenIssue(input)

@@ -26,9 +26,10 @@ import {
   DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { issues as initialIssues, type Issue } from '@/lib/data';
+import { type Issue } from '@/lib/data';
 import { IssueDetailsDialog } from './issue-details-dialog';
 import { useSearch } from '@/hooks/use-search';
+import { useIssues } from '@/hooks/use-issues';
 
 const statusVariant = {
   New: 'destructive',
@@ -37,7 +38,7 @@ const statusVariant = {
 } as const;
 
 export function RecentIssues() {
-  const [issues, setIssues] = useState<Issue[]>(initialIssues);
+  const { issues, setIssues } = useIssues();
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { searchTerm } = useSearch();

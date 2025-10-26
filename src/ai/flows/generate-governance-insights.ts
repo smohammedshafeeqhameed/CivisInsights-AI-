@@ -4,6 +4,7 @@
  * @fileOverview Generates proactive insights and recommendations for governance based on analyzed citizen feedback.
  *
  * - generateGovernanceInsights - A function that generates governance insights.
+ * - GenerateGovernanceInsightsInputSchema - The Zod schema for the input.
  * - GenerateGovernanceInsightsInput - The input type for the generateGovernanceInsights function.
  * - GenerateGovernanceInsightsOutput - The return type for the generateGovernanceInsights function.
  */
@@ -11,7 +12,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const GenerateGovernanceInsightsInputSchema = z.object({
+export const GenerateGovernanceInsightsInputSchema = z.object({
   citizenFeedbackSummary: z
     .string()
     .describe('A summary of citizen feedback on various issues.'),

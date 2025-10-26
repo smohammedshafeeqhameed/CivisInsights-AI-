@@ -29,26 +29,9 @@ import {
   ChartLegendContent,
   type ChartConfig
 } from '@/components/ui/chart';
-import { issues } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-
-const issuesByCategory = issues.reduce((acc, issue) => {
-  acc[issue.category] = (acc[issue.category] || 0) + 1;
-  return acc;
-}, {} as Record<string, number>);
-
-const issuesByCategoryData = Object.keys(issuesByCategory).map((category) => ({
-  name: category,
-  value: issuesByCategory[category],
-}));
-
-const resolutionStatusData = issues.reduce((acc, issue) => {
-    acc[issue.status] = (acc[issue.status] || 0) + 1;
-    return acc;
-}, {} as Record<string, number>);
-
-const resolutionStatusChartData = Object.keys(resolutionStatusData).map(key => ({name: key, value: resolutionStatusData[key]}));
+import { useIssues } from '@/hooks/use-issues';
 
 const weeklyTrendsData = [
   { date: 'Mon', new: 10, resolved: 8 },
@@ -72,7 +55,7 @@ const pieChartConfig = {
 const barChartConfig = {
     value: { label: "Count" },
     New: { label: "New", color: "hsl(var(--chart-4))" },
-    "In Progress": { label: "In Progress", color: "hsl(var(--chart-3))" },
+    "InProgress": { label: "In Progress", color: "hsl(var(--chart-3))" },
     Resolved: { label: "Resolved", color: "hsl(var(--chart-2))" },
 } satisfies ChartConfig
 
@@ -84,6 +67,27 @@ const lineChartConfig = {
 const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 
 export default function AnalyticsPage() {
+    const { issues } = useIssues();
+
+    const issuesByCategory = issues.reduce((acc, issue) => {
+      acc[issue.category] = (acc[issue.category] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const issuesByCategoryData = Object.keys(issuesByCategory).map((category) => ({
+      name: category,
+      value: issuesByCategory[category],
+    }));
+
+    const resolutionStatusData = issues.reduce((acc, issue) => {
+        const statusKey = issue.status.replace(' ', '');
+        acc[statusKey] = (acc[statusKey] || 0) + 1;
+        return acc;
+    }, {} as Record<string, number>);
+
+    const resolutionStatusChartData = Object.keys(resolutionStatusData).map(key => ({name: key, value: resolutionStatusData[key]}));
+
+
   return (
     <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
         <Card className="xl:col-span-2">
@@ -148,13 +152,13 @@ export default function AnalyticsPage() {
                 </PieChart>
                 </ChartContainer>
             </CardContent>
-             <CardContent className="mt-4 flex flex-col gap-2 text-sm">
+             {issuesByCategoryData.length > 0 && <CardContent className="mt-4 flex flex-col gap-2 text-sm">
                 <Separator />
                 <div className="flex items-center justify-between">
                     <span className='font-medium'>Most Reported</span>
                     <Badge variant="destructive">{issuesByCategoryData.sort((a,b) => b.value - a.value)[0].name}</Badge>
                 </div>
-            </CardContent>
+            </CardContent>}
         </Card>
 
         <Card className='xl:col-span-2'>
