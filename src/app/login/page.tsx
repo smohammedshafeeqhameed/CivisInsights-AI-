@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { GoogleAuthProvider, signInWithPopup, User } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { useAuth, useUser, useFirestore } from '@/firebase';
+import { useAuth, useUser, useFirestore, errorEmitter, FirestorePermissionError } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { SealOfMaharashtra } from '@/components/icons';
 
@@ -12,7 +12,7 @@ const provider = new GoogleAuthProvider();
 
 function GoogleIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="size-6">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48" className="size-6">
       <path
         fill="#FFC107"
         d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"
@@ -48,12 +48,11 @@ export default function LoginPage() {
     }
   }, [user, profile, isUserLoading, router]);
 
-  const updateUserProfile = async (user: User) => {
+  const updateUserProfile = (user: User) => {
     if (!firestore) return;
     const userRef = doc(firestore, 'users', user.uid);
     const { displayName, email, photoURL } = user;
     
-    // Deconstruct name into first and last
     const nameParts = displayName?.split(' ') || [];
     const firstName = nameParts[0] || '';
     const lastName = nameParts.slice(1).join(' ') || '';
@@ -68,15 +67,23 @@ export default function LoginPage() {
       displayName: displayName,
       role: 'admin', // Assign 'admin' role for official login
     };
-    // Use setDoc with merge to create or update the user document.
-    await setDoc(userRef, userData, { merge: true });
+    
+    // Use setDoc with a .catch() block for error handling
+    setDoc(userRef, userData, { merge: true }).catch(serverError => {
+        const permissionError = new FirestorePermissionError({
+            path: userRef.path,
+            operation: 'write',
+            requestResourceData: userData
+        });
+        errorEmitter.emit('permission-error', permissionError);
+    });
   }
 
   const handleSignIn = async () => {
     if (auth) {
       try {
         const result = await signInWithPopup(auth, provider);
-        await updateUserProfile(result.user);
+        updateUserProfile(result.user);
         router.push('/dashboard');
       } catch (error: any) {
         if (error.code !== 'auth/popup-closed-by-user') {
