@@ -43,7 +43,7 @@ const PredictServiceDemandOutputSchema = z.object({
     ),
   potentialProblemAreas: z
     .string()
-    _ .describe(
+    .describe(
       'Identification of potential problem areas based on analyzed data and summaries.'
     ),
 });
