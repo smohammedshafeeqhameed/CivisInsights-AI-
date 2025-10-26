@@ -49,8 +49,12 @@ export default function LoginPage() {
       try {
         await signInWithPopup(auth, provider);
         router.push('/dashboard');
-      } catch (error) {
-        console.error('Error signing in with Google:', error);
+      } catch (error: any) {
+        // This specific error code means the user closed the popup.
+        // It's a normal user action, so we can safely ignore it.
+        if (error.code !== 'auth/popup-closed-by-user') {
+          console.error('Error signing in with Google:', error);
+        }
       }
     }
   };
