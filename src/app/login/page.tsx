@@ -47,6 +47,7 @@ export default function LoginPage() {
   }, [user, isUserLoading, router]);
 
   const updateUserProfile = async (user: User) => {
+    if (!firestore) return;
     const userRef = doc(firestore, 'users', user.uid);
     const { displayName, email, photoURL } = user;
     
@@ -62,6 +63,7 @@ export default function LoginPage() {
       firstName: firstName,
       lastName: lastName,
       profilePicture: photoURL,
+      displayName: displayName,
     };
     // Use setDoc with merge to create or update the user document.
     await setDoc(userRef, userData, { merge: true });
@@ -90,28 +92,33 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md space-y-8 text-center">
-        <div>
-            <SealOfMaharashtra className="h-24 w-24 mx-auto mb-6 text-primary" />
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
+      <div className="relative w-full max-w-md">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
+        <div className="relative bg-card p-8 shadow-lg rounded-3xl sm:p-10 text-center">
+            <div className="mx-auto mb-6">
+                <SealOfMaharashtra className="h-24 w-24 mx-auto text-primary" />
+            </div>
             <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Welcome to
             </h1>
             <h2 className="mt-2 text-4xl font-extrabold text-primary sm:text-5xl">
               Government of Maharashtra
             </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
+            <p className="mt-6 text-lg text-muted-foreground">
               Sign in to access the CivisInsights AI dashboard.
             </p>
+            <div className="mt-10">
+                <Button
+                    onClick={handleSignIn}
+                    className="w-full text-lg"
+                    size="lg"
+                >
+                    <GoogleIcon />
+                    <span>Sign in with Google</span>
+                </Button>
+            </div>
         </div>
-        <Button
-            onClick={handleSignIn}
-            className="w-full"
-            variant="outline"
-        >
-            <GoogleIcon />
-            <span>Sign in with Google</span>
-        </Button>
       </div>
     </div>
   );
