@@ -27,7 +27,7 @@ import {
   DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { issues, type Issue } from '@/lib/data';
+import { issues as initialIssues, type Issue } from '@/lib/data';
 import { IssueDetailsDialog } from './issue-details-dialog';
 
 const statusVariant = {
@@ -37,12 +37,21 @@ const statusVariant = {
 } as const;
 
 export function RecentIssues() {
+  const [issues, setIssues] = useState<Issue[]>(initialIssues);
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleViewDetails = (issue: Issue) => {
     setSelectedIssue(issue);
     setIsDialogOpen(true);
+  };
+
+  const handleAssignIssue = (issueId: string) => {
+    setIssues(prevIssues =>
+      prevIssues.map(issue =>
+        issue.id === issueId ? { ...issue, status: 'In Progress' } : issue
+      )
+    );
   };
 
   return (
@@ -101,7 +110,12 @@ export function RecentIssues() {
                         <DropdownMenuItem onClick={() => handleViewDetails(issue)}>
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem>Assign</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleAssignIssue(issue.id)}
+                          disabled={issue.status !== 'New'}
+                        >
+                          Assign
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
