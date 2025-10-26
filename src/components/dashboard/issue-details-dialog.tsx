@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
@@ -19,7 +20,7 @@ import {
   summarizeCitizenIssue,
   type SummarizeCitizenIssueOutput,
 } from '@/ai/flows/summarize-citizen-issue';
-import { Lightbulb, ListChecks, Activity } from 'lucide-react';
+import { Lightbulb, ListChecks, Activity, Image as ImageIcon } from 'lucide-react';
 
 interface IssueDetailsDialogProps {
   issue: Issue | null;
@@ -95,6 +96,15 @@ export function IssueDetailsDialog({
                 <h4 className='text-sm font-medium'>Full Report</h4>
                 <p className='text-muted-foreground text-sm italic'>"{issue.report}"</p>
             </div>
+
+            {issue.image && (
+              <div className="space-y-2">
+                 <h4 className='text-sm font-medium flex items-center gap-2'><ImageIcon className='size-4' /> Attached Image</h4>
+                 <div className="relative aspect-video w-full max-w-md overflow-hidden rounded-md border">
+                    <Image src={issue.image} alt={`Image for issue ${issue.id}`} layout="fill" objectFit="cover" />
+                 </div>
+              </div>
+            )}
           
             <Separator />
 

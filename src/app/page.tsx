@@ -32,6 +32,8 @@ import { SealOfMaharashtra } from '@/components/icons';
 import { useIssues } from '@/hooks/use-issues';
 import Link from 'next/link';
 import { SplashScreen } from '@/components/splash-screen';
+import { Input } from '@/components/ui/input';
+import Image from 'next/image';
 
 const formSchema = z.object({
   category: z.string({
@@ -79,6 +81,8 @@ export default function CitizenHomePage() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const firestore = useFirestore();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -93,6 +97,21 @@ export default function CitizenHomePage() {
       report: '',
     },
   });
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImageFile(null);
+      setImagePreview(null);
+    }
+  };
 
   const updateUserProfile = (user: User) => {
     if (!firestore) return;
@@ -154,6 +173,7 @@ export default function CitizenHomePage() {
       report: data.report,
       summary: data.report.substring(0, 50) + '...',
       status: 'New' as const,
+      image: imagePreview,
     };
 
     setIssues((prevIssues) => [newIssue, ...prevIssues]);
@@ -163,6 +183,8 @@ export default function CitizenHomePage() {
       description: 'Thank you for your report. It has been sent to the relevant department.',
     });
     form.reset();
+    setImageFile(null);
+    setImagePreview(null);
   }
 
   if (showSplash) {
@@ -272,6 +294,31 @@ export default function CitizenHomePage() {
                         </FormItem>
                       )}
                     />
+                     <FormItem>
+                      <FormLabel>Upload Image (Optional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className='cursor-pointer'
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        A picture is worth a thousand words.
+                      </FormDescription>
+                       {imagePreview && (
+                        <div className="mt-4">
+                           <Image
+                            src={imagePreview}
+                            alt="Image preview"
+                            width={200}
+                            height={200}
+                            className="rounded-md object-cover"
+                          />
+                        </div>
+                      )}
+                    </FormItem>
                     <Button type="submit" className="w-full" size="lg">
                       Submit Report
                     </Button>

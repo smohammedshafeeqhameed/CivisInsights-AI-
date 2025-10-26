@@ -4,6 +4,7 @@ export type Issue = {
   report: string;
   summary: string;
   status: 'New' | 'In Progress' | 'Resolved';
+  image?: string | null;
 };
 
 export const issues: Issue[] = [
