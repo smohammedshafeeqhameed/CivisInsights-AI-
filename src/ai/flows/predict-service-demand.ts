@@ -37,14 +37,14 @@ const PredictServiceDemandOutputSchema = z.object({
       'A JSON array of objects, where each object represents a service and has keys "service", "currentDemand", and "predictedDemand". Example: [{"service": "Sanitation", "currentDemand": 110, "predictedDemand": 150}]'
     ),
   resourceAllocationRecommendations: z
-    .string()
+    .array(z.string())
     .describe(
-      'Recommendations for resource allocation based on predicted demand.'
+      'A list of recommendations for resource allocation based on predicted demand.'
     ),
   potentialProblemAreas: z
-    .string()
+    .array(z.string())
     .describe(
-      'Identification of potential problem areas based on analyzed data and summaries.'
+      'A list of potential problem areas based on analyzed data and summaries.'
     ),
 });
 export type PredictServiceDemandOutput = z.infer<
@@ -77,8 +77,8 @@ Prediction Horizon:
 Based on your analysis, provide the following:
 
 1.  Predicted Service Demand: Detail the anticipated service demand as a JSON array. Each object in the array should represent a service and have keys "service", "currentDemand", and "predictedDemand". The services to analyze are 'Sanitation', 'Roads', 'Safety', 'Parks', and 'Admin'.
-2.  Resource Allocation Recommendations: Offer concrete recommendations for resource allocation to meet the predicted demand.
-3.  Potential Problem Areas: Identify any potential problem areas or issues based on the analyzed data and summaries.
+2.  Resource Allocation Recommendations: Offer a list of concrete recommendations for resource allocation to meet the predicted demand.
+3.  Potential Problem Areas: Identify a list of any potential problem areas or issues based on the analyzed data and summaries.
 
 Format your output according to the output schema.
 `,

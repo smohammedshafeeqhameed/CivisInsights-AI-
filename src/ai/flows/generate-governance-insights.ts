@@ -24,11 +24,19 @@ export type GenerateGovernanceInsightsInput = z.infer<
 >;
 
 const GenerateGovernanceInsightsOutputSchema = z.object({
-  insights: z
+  keyInsight: z
     .string()
     .describe(
-      'Proactive insights and recommendations for governance based on the analyzed citizen feedback and predicted trends.'
+      'The single most important, concise insight discovered from the data.'
     ),
+  recommendations: z
+    .array(z.string())
+    .describe(
+      'A list of actionable recommendations for governance based on the insight.'
+    ),
+  dataPoints: z
+    .array(z.string())
+    .describe('A list of specific data points that support the insight.'),
 });
 export type GenerateGovernanceInsightsOutput = z.infer<
   typeof GenerateGovernanceInsightsOutputSchema
@@ -47,13 +55,15 @@ const prompt = ai.definePrompt({
   prompt: `You are a policy advisor tasked with generating proactive insights and recommendations for governance.
 
   Analyze the provided citizen feedback summary and historical demand data to identify trends, patterns, and potential issues.
-  Based on your analysis, provide actionable insights and recommendations that can inform policy development and improve public services.
+  Based on your analysis, provide a primary key insight, a list of supporting data points, and a list of actionable recommendations.
 
   Citizen Feedback Summary: {{{citizenFeedbackSummary}}}
   Historical Demand Data: {{{historicalDemandData}}}
 
-  Provide your insights and recommendations in a clear and concise manner.
-  Remember to format your output according to the output schema.`,
+  Provide your analysis in the structured format required by the output schema.
+  - keyInsight: A concise, single sentence summarizing the core issue.
+  - dataPoints: A list of 2-3 specific data points backing up your insight.
+  - recommendations: A list of 2-3 concrete, actionable steps to address the issue.`,
 });
 
 const generateGovernanceInsightsFlow = ai.defineFlow(

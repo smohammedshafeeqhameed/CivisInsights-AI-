@@ -1,6 +1,7 @@
 'use client';
 
 import { Bar, BarChart, XAxis, YAxis, Tooltip } from 'recharts';
+import { ListChecks, AlertTriangle } from 'lucide-react';
 import {
   Card,
   CardHeader,
@@ -17,6 +18,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
 import { predictServiceDemand } from '@/ai/flows/predict-service-demand';
+import { Separator } from '../ui/separator';
 
 const chartConfig = {
   predictedDemand: {
@@ -38,28 +40,31 @@ interface DemandData {
 export function DemandPrediction() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DemandData[] | null>(null);
-  const [recommendations, setRecommendations] = useState('');
+  const [recommendations, setRecommendations] = useState<string[]>([]);
+  const [problemAreas, setProblemAreas] = useState<string[]>([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setError('');
       try {
         const result = await predictServiceDemand({
-          historicalData: 'Past 6 months of service requests show a 15% increase in sanitation and a 5% decrease in parks & rec requests during winter.',
-          currentIssueSummaries: 'Recent issues include multiple reports of overflowing bins and requests for pothole repairs.',
+          historicalData:
+            'Past 6 months of service requests show a 15% increase in sanitation and a 5% decrease in parks & rec requests during winter.',
+          currentIssueSummaries:
+            'Recent issues include multiple reports of overflowing bins and requests for pothole repairs.',
           predictionHorizon: 'next month',
         });
-        
-        // A real implementation would parse the string response into structured data.
-        // For this demo, we'll create some plausible data based on the response.
+
         const predicted = JSON.parse(result.predictedDemand) as DemandData[];
 
         setData(predicted);
         setRecommendations(result.resourceAllocationRecommendations);
+        setProblemAreas(result.potentialProblemAreas);
       } catch (e) {
         console.error('Failed to fetch demand prediction:', e);
-        // setData(demandPrediction); // Fallback to mock data on error
-        setRecommendations('Could not load AI-powered recommendations.');
+        setError('Could not load AI-powered predictions.');
       }
       setLoading(false);
     };
@@ -75,15 +80,13 @@ export function DemandPrediction() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {loading || !data ? (
+        {loading ? (
           <Skeleton className="h-[200px] w-full" />
+        ) : error || !data ? (
+          <div className="text-sm text-muted-foreground">{error}</div>
         ) : (
           <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-            <BarChart
-              accessibilityLayer
-              data={data}
-              margin={{ left: -20 }}
-            >
+            <BarChart accessibilityLayer data={data} margin={{ left: -20 }}>
               <XAxis
                 dataKey="service"
                 tickLine={false}
@@ -115,14 +118,42 @@ export function DemandPrediction() {
           </ChartContainer>
         )}
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="font-medium leading-none">Recommendations</div>
+      <CardFooter className="flex-col items-start gap-4 text-sm">
         {loading ? (
+          <div className="w-full space-y-2">
             <Skeleton className="h-8 w-full" />
-        ) : (
-            <div className="leading-none text-muted-foreground">
-                {recommendations}
-            </div>
+            <Skeleton className="h-8 w-full" />
+          </div>
+        ) : !error && (
+          <>
+            {recommendations.length > 0 && (
+              <div className="grid w-full gap-2">
+                <div className="flex items-center gap-2 font-medium leading-none">
+                  <ListChecks className="size-4 text-muted-foreground" />
+                  <span>Resource Recommendations</span>
+                </div>
+                <ul className="list-disc pl-5 text-muted-foreground">
+                  {recommendations.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <Separator />
+            {problemAreas.length > 0 && (
+              <div className="grid w-full gap-2">
+                <div className="flex items-center gap-2 font-medium leading-none">
+                  <AlertTriangle className="size-4 text-muted-foreground" />
+                  <span>Potential Problem Areas</span>
+                </div>
+                <ul className="list-disc pl-5 text-muted-foreground">
+                  {problemAreas.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </>
         )}
       </CardFooter>
     </Card>
