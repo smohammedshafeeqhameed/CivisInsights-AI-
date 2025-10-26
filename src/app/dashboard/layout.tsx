@@ -45,7 +45,7 @@ export default function DashboardLayout({
                 isActive
                 tooltip={{ children: 'Dashboard' }}
               >
-                <Link href="/dashboard">
+                <Link href="/">
                   <LayoutDashboard />
                   Dashboard
                 </Link>
