@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
 
 type UploadStatus = 'pending' | 'uploading' | 'success' | 'error';
 
@@ -109,6 +111,21 @@ export default function DataHubPage() {
               Upload
             </Button>
           </div>
+        </CardContent>
+        <Separator className="my-4" />
+        <CardContent>
+          <h3 className="text-sm font-medium mb-2">Sample CSV Format</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Your CSV file should contain the following headers and data structure:
+          </p>
+          <pre className="bg-muted p-4 rounded-lg text-sm text-muted-foreground overflow-x-auto">
+            <code>
+{`id,category,report,summary,status
+CIV-001,Road Maintenance,"Large pothole on the corner of Main St and 2nd Ave, causing traffic issues.","Pothole at Main & 2nd causing traffic disruption.",New
+CIV-002,Public Safety,"Streetlight is out on Elm Street between 3rd and 4th.","Streetlight outage on Elm St.",In Progress
+CIV-003,Sanitation,"Public trash can on Oak Ave is overflowing and has not been collected for days.","Overflowing public trash can on Oak Ave.",New`}
+            </code>
+          </pre>
         </CardContent>
       </Card>
 
