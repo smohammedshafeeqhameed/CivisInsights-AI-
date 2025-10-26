@@ -100,6 +100,7 @@ export default function CitizenHomePage() {
       lastName: lastName,
       profilePicture: photoURL,
       displayName: displayName,
+      role: 'public', // Assign 'public' role for citizen login
     };
     await setDoc(userRef, userData, { merge: true });
   }

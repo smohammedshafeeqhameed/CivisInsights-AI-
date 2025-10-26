@@ -37,14 +37,16 @@ function GoogleIcon() {
 export default function LoginPage() {
   const auth = useAuth();
   const firestore = useFirestore();
-  const { user, isUserLoading } = useUser();
+  const { user, profile, isUserLoading } = useUser();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isUserLoading && user) {
-      router.replace('/dashboard');
+    if (!isUserLoading && user && profile) {
+      if (profile.role === 'admin') {
+        router.replace('/dashboard');
+      }
     }
-  }, [user, isUserLoading, router]);
+  }, [user, profile, isUserLoading, router]);
 
   const updateUserProfile = async (user: User) => {
     if (!firestore) return;
@@ -64,6 +66,7 @@ export default function LoginPage() {
       lastName: lastName,
       profilePicture: photoURL,
       displayName: displayName,
+      role: 'admin', // Assign 'admin' role for official login
     };
     // Use setDoc with merge to create or update the user document.
     await setDoc(userRef, userData, { merge: true });
@@ -83,7 +86,7 @@ export default function LoginPage() {
     }
   };
 
-  if (isUserLoading || user) {
+  if (isUserLoading || (user && profile?.role === 'admin')) {
     return (
       <div className="flex h-screen w-screen items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
@@ -105,7 +108,7 @@ export default function LoginPage() {
             <h2 className="mt-2 text-4xl font-extrabold text-primary sm:text-5xl">
               Government of Maharashtra
             </h2>
-            <p className="mt-6 text-lg text-muted-foreground">
+             <p className="mt-6 text-lg text-muted-foreground">
               Sign in to access the CivisInsights AI dashboard.
             </p>
             <div className="mt-10">

@@ -36,17 +36,22 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isUserLoading } = useUser();
+  const { user, profile, isUserLoading } = useUser();
   const auth = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    // If auth state is resolved and there's no user, redirect to login
-    if (!isUserLoading && !user) {
-      router.replace('/login');
+    if (!isUserLoading) {
+      if (!user) {
+        // Not logged in, redirect to official login
+        router.replace('/login');
+      } else if (profile && profile.role !== 'admin') {
+        // Logged in, but not an admin, redirect to public homepage
+        router.replace('/');
+      }
     }
-  }, [user, isUserLoading, router]);
+  }, [user, profile, isUserLoading, router]);
 
   const handleLogout = () => {
     if (auth) {
@@ -55,9 +60,9 @@ export default function DashboardLayout({
     }
   };
 
-  // While loading or if no user, show a loading spinner.
+  // While loading or if user is not an admin, show a loading spinner.
   // This prevents a flash of the dashboard content before redirection.
-  if (isUserLoading || !user) {
+  if (isUserLoading || !user || !profile || profile.role !== 'admin') {
     return (
       <div className="flex h-screen w-screen items-center justify-center">
         <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
