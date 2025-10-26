@@ -200,6 +200,9 @@ export default function CitizenHomePage() {
             <span className="font-bold">CivisInsights</span>
           </Link>
           <div className="flex items-center gap-4">
+            <Button variant="ghost" asChild>
+                <Link href="/transparency">Transparency</Link>
+            </Button>
             {isUserLoading ? (
               <div className="h-9 w-24 animate-pulse rounded-md bg-gray-200"></div>
             ) : user ? (
