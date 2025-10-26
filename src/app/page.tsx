@@ -1,5 +1,7 @@
+
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,6 +31,7 @@ import { useToast } from '@/hooks/use-toast';
 import { SealOfMaharashtra } from '@/components/icons';
 import { useIssues } from '@/hooks/use-issues';
 import Link from 'next/link';
+import { SplashScreen } from '@/components/splash-screen';
 
 const formSchema = z.object({
   category: z.string({
@@ -70,11 +73,19 @@ function GoogleIcon() {
 }
 
 export default function CitizenHomePage() {
+  const [showSplash, setShowSplash] = useState(true);
   const { toast } = useToast();
   const { setIssues } = useIssues();
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const firestore = useFirestore();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2000); // Show splash for 2 seconds
+    return () => clearTimeout(timer);
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -144,6 +155,10 @@ export default function CitizenHomePage() {
       description: 'Thank you for your report. It has been sent to the relevant department.',
     });
     form.reset();
+  }
+
+  if (showSplash) {
+    return <SplashScreen />;
   }
 
   return (
