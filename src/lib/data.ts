@@ -45,6 +45,43 @@ export const issues: Issue[] = [
     summary: 'Early morning construction noise on Pine St.',
     status: 'Resolved',
   },
+  {
+    id: 'CIV-006',
+    category: 'Sanitation',
+    report: 'Missed garbage collection on Maple Avenue for the third time this month.',
+    summary: 'Repeated missed garbage collection on Maple Ave.',
+    status: 'New',
+    image: 'https://picsum.photos/seed/6/600/400'
+  },
+  {
+    id: 'CIV-007',
+    category: 'Road Maintenance',
+    report: 'The traffic light at the intersection of Washington and Lincoln is not working correctly. It is stuck on red.',
+    summary: 'Malfunctioning traffic light at Washington/Lincoln.',
+    status: 'In Progress',
+  },
+  {
+    id: 'CIV-008',
+    category: 'Public Safety',
+    report: 'A large group of people are gathering in the park after hours, causing a disturbance.',
+    summary: 'After-hours disturbance in park.',
+    status: 'New',
+  },
+  {
+    id: 'CIV-009',
+    category: 'Other',
+    report: 'Abandoned vehicle has been parked on Birch Street for over a week. License plate XYZ 123.',
+    summary: 'Abandoned vehicle on Birch Street.',
+    status: 'New',
+  },
+  {
+    id: 'CIV-010',
+    category: 'Parks & Rec',
+    report: 'The water fountain at City Hall Plaza is leaking, creating a large puddle.',
+    summary: 'Leaking water fountain at City Hall Plaza.',
+    status: 'Resolved',
+    image: 'https://picsum.photos/seed/10/600/400'
+  },
 ];
 
 export type DemandPredictionData = {
