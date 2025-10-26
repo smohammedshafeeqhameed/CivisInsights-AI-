@@ -32,21 +32,25 @@ export default function DashboardPage() {
           title="New Issues"
           value={newIssues}
           icon={MessageSquareWarning}
+          variant="blue"
         />
         <StatCard
           title="Resolved Issues"
           value={resolvedIssues}
           icon={CheckCircle2}
+          variant="green"
         />
         <StatCard
           title="Pending Review"
           value={pendingReview}
           icon={Hourglass}
+          variant="amber"
         />
         <StatCard
           title="Avg. Resolution Time"
           value={avgResolutionTime}
           icon={Clock}
+          variant="indigo"
         />
       </div>
 
