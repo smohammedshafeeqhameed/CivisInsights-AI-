@@ -1,9 +1,14 @@
+'use client';
+
+import { useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   FileText,
   BarChart3,
   Settings,
+  LogOut,
 } from 'lucide-react';
 
 import {
@@ -20,12 +25,38 @@ import {
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/dashboard/header';
+import { useAuth, useUser } from '@/firebase';
+import { signOut } from 'firebase/auth';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, isUserLoading, router]);
+
+  const handleLogout = () => {
+    if (auth) {
+      signOut(auth);
+    }
+  };
+  
+  if (isUserLoading || !user) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -45,7 +76,7 @@ export default function DashboardLayout({
                 isActive
                 tooltip={{ children: 'Dashboard' }}
               >
-                <Link href="/">
+                <Link href="/dashboard">
                   <LayoutDashboard />
                   Dashboard
                 </Link>
@@ -77,6 +108,12 @@ export default function DashboardLayout({
                   <Settings />
                   Settings
                 </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={handleLogout} tooltip={{ children: 'Log Out' }}>
+                <LogOut />
+                Log Out
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

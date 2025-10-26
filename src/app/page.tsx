@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { SplashScreen } from '@/components/splash-screen';
-import DashboardPage from './dashboard/page';
-import DashboardLayout from './dashboard/layout';
+import { useUser } from '@/firebase';
 
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -15,11 +17,19 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
 
-  return showSplash ? (
-    <SplashScreen />
-  ) : (
-    <DashboardLayout>
-      <DashboardPage />
-    </DashboardLayout>
-  );
+  useEffect(() => {
+    if (!showSplash) {
+      if (isUserLoading) {
+        // Wait until user status is resolved
+        return;
+      }
+      if (user) {
+        router.replace('/dashboard');
+      } else {
+        router.replace('/login');
+      }
+    }
+  }, [showSplash, user, isUserLoading, router]);
+
+  return <SplashScreen />;
 }

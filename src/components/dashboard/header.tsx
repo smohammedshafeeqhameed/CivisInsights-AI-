@@ -9,7 +9,7 @@ import {
   LogOut,
   Settings,
 } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import {
   Sheet,
@@ -28,11 +28,24 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useSidebar } from '@/components/ui/sidebar';
+import { useAuth, useUser } from '@/firebase';
+import { signOut } from 'firebase/auth';
+
 
 export function Header() {
   const pathname = usePathname();
   const { toggleSidebar, isMobile } = useSidebar();
-  const avatar = PlaceHolderImages.find((img) => img.id === 'user-avatar');
+  const { user } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    if (auth) {
+      signOut(auth).then(() => {
+        router.push('/login');
+      });
+    }
+  };
 
   const pageTitle =
     pathname
@@ -72,21 +85,22 @@ export function Header() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">
-              {avatar && (
-                <Image
-                  src={avatar.imageUrl}
-                  width={40}
-                  height={40}
-                  alt={avatar.description}
-                  data-ai-hint={avatar.imageHint}
-                  className="rounded-full"
-                />
-              )}
+              {user?.photoURL ? (
+                  <Image
+                    src={user.photoURL}
+                    width={40}
+                    height={40}
+                    alt="User avatar"
+                    className="rounded-full"
+                  />
+                ) : (
+                  <User className="h-5 w-5" />
+                )}
               <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>{user?.displayName || 'My Account'}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <User className="mr-2 h-4 w-4" />
@@ -97,7 +111,7 @@ export function Header() {
               <span>Settings</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
             </DropdownMenuItem>
