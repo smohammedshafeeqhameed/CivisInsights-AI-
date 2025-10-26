@@ -16,6 +16,14 @@ import { getChatbotResponse } from '@/ai/flows/chatbot';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { SealOfMaharashtra } from '../icons';
+import { z } from 'zod';
+
+export const ChatbotResponseSchema = z.object({
+  text: z.string(),
+  audio: z.string().optional(),
+});
+export type ChatbotResponse = z.infer<typeof ChatbotResponseSchema>;
+
 
 interface Message {
   role: 'user' | 'model';

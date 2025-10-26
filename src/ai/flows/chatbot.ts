@@ -10,13 +10,7 @@ import { predictServiceDemand } from './predict-service-demand';
 import { prioritizeCitizenIssue } from './prioritize-citizen-issue';
 import { googleAI } from '@genkit-ai/google-genai';
 import wav from 'wav';
-
-export const ChatbotResponseSchema = z.object({
-  text: z.string(),
-  audio: z.string().optional(),
-});
-export type ChatbotResponse = z.infer<typeof ChatbotResponseSchema>;
-
+import { ChatbotResponse } from '@/components/dashboard/chatbot';
 
 const getInsightsTool = ai.defineTool(
   {
