@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   FileText,
@@ -35,6 +35,7 @@ export default function DashboardLayout({
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     // If auth state is resolved and there's no user, redirect to login
@@ -76,7 +77,7 @@ export default function DashboardLayout({
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
-                isActive
+                isActive={pathname === '/dashboard'}
                 tooltip={{ children: 'Dashboard' }}
               >
                 <Link href="/dashboard">
@@ -86,16 +87,24 @@ export default function DashboardLayout({
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={{ children: 'Reports' }}>
-                <Link href="#">
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === '/dashboard/reports'}
+                tooltip={{ children: 'Reports' }}
+              >
+                <Link href="/dashboard/reports">
                   <FileText />
                   Reports
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={{ children: 'Analytics' }}>
-                <Link href="#">
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === '/dashboard/analytics'}
+                tooltip={{ children: 'Analytics' }}
+              >
+                <Link href="/dashboard/analytics">
                   <BarChart3 />
                   Analytics
                 </Link>
