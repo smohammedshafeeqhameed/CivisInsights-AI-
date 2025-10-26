@@ -23,7 +23,7 @@ import {
   SidebarFooter,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { Logo } from '@/components/icons';
+import { SealOfMaharashtra } from '@/components/icons';
 import { Header } from '@/components/dashboard/header';
 import { useAuth, useUser } from '@/firebase';
 import { signOut } from 'firebase/auth';
@@ -67,7 +67,7 @@ export default function DashboardLayout({
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
-            <Logo className="size-8 text-primary" />
+            <SealOfMaharashtra className="size-8 text-primary" />
             <h1 className="text-lg font-semibold text-sidebar-foreground">
               CivisInsights
             </h1>
