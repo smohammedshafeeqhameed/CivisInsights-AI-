@@ -4,7 +4,6 @@
  * @fileOverview Analyzes a citizen-reported issue to assign a priority score and suggest the appropriate department.
  *
  * - prioritizeCitizenIssue - A function that analyzes and prioritizes a citizen issue.
- * - PrioritizeCitizenIssueInputSchema - The Zod schema for the input.
  * - PrioritizeCitizenIssueInput - The input type for the prioritizeCitizenIssue function.
  * - PrioritizeCitizenIssueOutput - The return type for the prioritizeCitizenIssue function.
  */
@@ -12,7 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const PrioritizeCitizenIssueInputSchema = z.object({
+const PrioritizeCitizenIssueInputSchema = z.object({
   issueReport: z
     .string()
     .describe('The detailed report of the issue submitted by a citizen.'),
@@ -47,12 +46,6 @@ export type PrioritizeCitizenIssueOutput = z.infer<
   typeof PrioritizeCitizenIssueOutputSchema
 >;
 
-export async function prioritizeCitizenIssue(
-  input: PrioritizeCitizenIssueInput
-): Promise<PrioritizeCitizenIssueOutput> {
-  return prioritizeCitizenIssueFlow(input);
-}
-
 const prompt = ai.definePrompt({
   name: 'prioritizeCitizenIssuePrompt',
   input: {schema: PrioritizeCitizenIssueInputSchema},
@@ -82,3 +75,10 @@ const prioritizeCitizenIssueFlow = ai.defineFlow(
     return output!;
   }
 );
+
+
+export async function prioritizeCitizenIssue(
+  input: PrioritizeCitizenIssueInput
+): Promise<PrioritizeCitizenIssueOutput> {
+  return prioritizeCitizenIssueFlow(input);
+}

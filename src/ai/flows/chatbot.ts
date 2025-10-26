@@ -5,25 +5,23 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import {
-  generateGovernanceInsights,
-  GenerateGovernanceInsightsInputSchema,
-} from './generate-governance-insights';
-import {
-  predictServiceDemand,
-  PredictServiceDemandInputSchema,
-} from './predict-service-demand';
-import {
-  prioritizeCitizenIssue,
-  PrioritizeCitizenIssueInputSchema,
-} from './prioritize-citizen-issue';
+import { generateGovernanceInsights } from './generate-governance-insights';
+import { predictServiceDemand } from './predict-service-demand';
+import { prioritizeCitizenIssue } from './prioritize-citizen-issue';
 
 const getInsightsTool = ai.defineTool(
   {
     name: 'generateGovernanceInsights',
     description:
       'Generates proactive governance insights from citizen feedback and historical data.',
-    inputSchema: GenerateGovernanceInsightsInputSchema,
+    inputSchema: z.object({
+      citizenFeedbackSummary: z
+        .string()
+        .describe('A summary of citizen feedback on various issues.'),
+      historicalDemandData: z
+        .string()
+        .describe('Historical data on service demand.'),
+    }),
     outputSchema: z.any(),
   },
   async (input) => generateGovernanceInsights(input)
@@ -34,7 +32,21 @@ const predictDemandTool = ai.defineTool(
     name: 'predictServiceDemand',
     description:
       'Predicts future service demand based on historical data and current issues.',
-    inputSchema: PredictServiceDemandInputSchema,
+    inputSchema: z.object({
+      historicalData: z
+        .string()
+        .describe(
+          'Historical issue data, including dates, categories, and summaries.'
+        ),
+      currentIssueSummaries: z
+        .string()
+        .describe('Summaries of current citizen-reported issues.'),
+      predictionHorizon: z
+        .string()
+        .describe(
+          'The time horizon for the prediction (e.g., next week, next month).'
+        ),
+    }),
     outputSchema: z.any(),
   },
   async (input) => predictServiceDemand(input)
@@ -44,7 +56,16 @@ const prioritizeIssueTool = ai.defineTool(
   {
     name: 'prioritizeCitizenIssue',
     description: 'Analyzes and prioritizes a single citizen issue.',
-    inputSchema: PrioritizeCitizenIssueInputSchema,
+    inputSchema: z.object({
+      issueReport: z
+        .string()
+        .describe('The detailed report of the issue submitted by a citizen.'),
+      issueCategory: z
+        .string()
+        .describe(
+          'The current category of the reported issue (e.g., road maintenance, public safety, sanitation).'
+        ),
+    }),
     outputSchema: z.any(),
   },
   async (input) => prioritizeCitizenIssue(input)

@@ -4,7 +4,6 @@
  * @fileOverview Generates proactive insights and recommendations for governance based on analyzed citizen feedback.
  *
  * - generateGovernanceInsights - A function that generates governance insights.
- * - GenerateGovernanceInsightsInputSchema - The Zod schema for the input.
  * - GenerateGovernanceInsightsInput - The input type for the generateGovernanceInsights function.
  * - GenerateGovernanceInsightsOutput - The return type for the generateGovernanceInsights function.
  */
@@ -12,7 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const GenerateGovernanceInsightsInputSchema = z.object({
+const GenerateGovernanceInsightsInputSchema = z.object({
   citizenFeedbackSummary: z
     .string()
     .describe('A summary of citizen feedback on various issues.'),
@@ -43,12 +42,6 @@ export type GenerateGovernanceInsightsOutput = z.infer<
   typeof GenerateGovernanceInsightsOutputSchema
 >;
 
-export async function generateGovernanceInsights(
-  input: GenerateGovernanceInsightsInput
-): Promise<GenerateGovernanceInsightsOutput> {
-  return generateGovernanceInsightsFlow(input);
-}
-
 const prompt = ai.definePrompt({
   name: 'generateGovernanceInsightsPrompt',
   input: {schema: GenerateGovernanceInsightsInputSchema},
@@ -78,3 +71,10 @@ const generateGovernanceInsightsFlow = ai.defineFlow(
     return output!;
   }
 );
+
+
+export async function generateGovernanceInsights(
+  input: GenerateGovernanceInsightsInput
+): Promise<GenerateGovernanceInsightsOutput> {
+  return generateGovernanceInsightsFlow(input);
+}

@@ -4,7 +4,6 @@
  * @fileOverview Predicts future service demand based on historical issue data and summaries.
  *
  * - predictServiceDemand - A function that predicts future service demand.
- * - PredictServiceDemandInputSchema - The Zod schema for the input.
  * - PredictServiceDemandInput - The input type for the predictServiceDemand function.
  * - PredictServiceDemandOutput - The return type for the predictServiceDemand function.
  */
@@ -12,7 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const PredictServiceDemandInputSchema = z.object({
+const PredictServiceDemandInputSchema = z.object({
   historicalData: z
     .string()
     .describe(
@@ -52,12 +51,6 @@ export type PredictServiceDemandOutput = z.infer<
   typeof PredictServiceDemandOutputSchema
 >;
 
-export async function predictServiceDemand(
-  input: PredictServiceDemandInput
-): Promise<PredictServiceDemandOutput> {
-  return predictServiceDemandFlow(input);
-}
-
 const prompt = ai.definePrompt({
   name: 'predictServiceDemandPrompt',
   input: {schema: PredictServiceDemandInputSchema},
@@ -96,3 +89,10 @@ const predictServiceDemandFlow = ai.defineFlow(
     return output!;
   }
 );
+
+
+export async function predictServiceDemand(
+  input: PredictServiceDemandInput
+): Promise<PredictServiceDemandOutput> {
+  return predictServiceDemandFlow(input);
+}
