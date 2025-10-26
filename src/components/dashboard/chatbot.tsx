@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Bot, Send, X, User } from 'lucide-react';
+import { Bot, Send, X, User, Volume2, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -20,6 +20,7 @@ import { SealOfMaharashtra } from '../icons';
 interface Message {
   role: 'user' | 'model';
   text: string;
+  audio?: string;
 }
 
 export function Chatbot() {
@@ -28,6 +29,7 @@ export function Chatbot() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -37,6 +39,13 @@ export function Chatbot() {
       });
     }
   }, [messages]);
+
+  const handlePlayAudio = (audioSrc: string) => {
+    if (audioRef.current) {
+      audioRef.current.src = audioSrc;
+      audioRef.current.play();
+    }
+  };
 
   const handleSend = async () => {
     if (input.trim() === '') return;
@@ -53,8 +62,8 @@ export function Chatbot() {
         content: [{ text: msg.text }],
       }));
 
-      const responseText = await getChatbotResponse(history, input);
-      const botMessage: Message = { role: 'model', text: responseText };
+      const response = await getChatbotResponse(history, input);
+      const botMessage: Message = { role: 'model', text: response.text, audio: response.audio };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       console.error('Chatbot error:', error);
@@ -82,6 +91,7 @@ export function Chatbot() {
 
   return (
     <>
+      <audio ref={audioRef} className="hidden" />
       <div className="fixed bottom-6 right-6 z-50">
         <Button
           onClick={toggleOpen}
@@ -127,15 +137,22 @@ export function Chatbot() {
                         )}
                       </AvatarFallback>
                     </Avatar>
-                    <div
-                      className={cn(
-                        'rounded-lg px-3 py-2 text-sm max-w-[80%]',
-                        message.role === 'user'
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted'
-                      )}
-                    >
-                      {message.text}
+                    <div className="flex-1 space-y-2">
+                        <div
+                        className={cn(
+                            'rounded-lg px-3 py-2 text-sm max-w-[80%]',
+                            message.role === 'user'
+                            ? 'bg-primary text-primary-foreground float-right'
+                            : 'bg-muted'
+                        )}
+                        >
+                        {message.text}
+                        </div>
+                        {message.role === 'model' && message.audio && (
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handlePlayAudio(message.audio!)}>
+                                <Play className="h-4 w-4" />
+                            </Button>
+                        )}
                     </div>
                   </div>
                 ))}

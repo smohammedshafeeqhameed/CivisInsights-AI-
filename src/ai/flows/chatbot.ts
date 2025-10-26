@@ -8,6 +8,15 @@ import { z } from 'genkit';
 import { generateGovernanceInsights } from './generate-governance-insights';
 import { predictServiceDemand } from './predict-service-demand';
 import { prioritizeCitizenIssue } from './prioritize-citizen-issue';
+import { googleAI } from '@genkit-ai/google-genai';
+import wav from 'wav';
+
+export const ChatbotResponseSchema = z.object({
+  text: z.string(),
+  audio: z.string().optional(),
+});
+export type ChatbotResponse = z.infer<typeof ChatbotResponseSchema>;
+
 
 const getInsightsTool = ai.defineTool(
   {
@@ -86,11 +95,81 @@ Example user questions you can answer:
   tools: [getInsightsTool, predictDemandTool, prioritizeIssueTool],
 });
 
-export async function getChatbotResponse(history: any[], query: string) {
+async function toWav(
+  pcmData: Buffer,
+  channels = 1,
+  rate = 24000,
+  sampleWidth = 2
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const writer = new wav.Writer({
+      channels,
+      sampleRate: rate,
+      bitDepth: sampleWidth * 8,
+    });
+
+    let bufs = [] as any[];
+    writer.on('error', reject);
+    writer.on('data', function (d) {
+      bufs.push(d);
+    });
+    writer.on('end', function () {
+      resolve(Buffer.concat(bufs).toString('base64'));
+    });
+
+    writer.write(pcmData);
+    writer.end();
+  });
+}
+
+const ttsFlow = ai.defineFlow(
+  {
+    name: 'textToSpeech',
+    inputSchema: z.string(),
+    outputSchema: z.string(),
+  },
+  async (text) => {
+    if (!text) return '';
+    try {
+      const { media } = await ai.generate({
+        model: googleAI.model('gemini-2.5-flash-preview-tts'),
+        config: {
+          responseModalities: ['AUDIO'],
+          speechConfig: {
+            voiceConfig: {
+              prebuiltVoiceConfig: { voiceName: 'Algenib' },
+            },
+          },
+        },
+        prompt: text,
+      });
+
+      if (!media) return '';
+
+      const audioBuffer = Buffer.from(
+        media.url.substring(media.url.indexOf(',') + 1),
+        'base64'
+      );
+
+      const wavBase64 = await toWav(audioBuffer);
+      return 'data:audio/wav;base64,' + wavBase64;
+    } catch (e) {
+      console.error('Error in TTS flow:', e);
+      return '';
+    }
+  }
+);
+
+
+export async function getChatbotResponse(history: any[], query: string): Promise<ChatbotResponse> {
   const response = await ai.generate({
     prompt: query,
     history,
     model: 'googleai/gemini-2.5-flash',
   });
-  return response.text;
+
+  const text = response.text;
+  const audio = await ttsFlow(text);
+
+  return { text, audio };
 }
