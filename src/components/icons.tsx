@@ -29,3 +29,77 @@ export function SealOfMaharashtra(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+
+export function NICIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 100 30"
+      fill="none"
+      {...props}
+    >
+      <text
+        x="5"
+        y="20"
+        fontFamily="Arial, sans-serif"
+        fontSize="20"
+        fontWeight="bold"
+        fill="currentColor"
+      >
+        NIC
+      </text>
+      <text
+        x="45"
+        y="12"
+        fontFamily="Arial, sans-serif"
+        fontSize="8"
+        fill="currentColor"
+      >
+        एनआईसी
+      </text>
+      <text
+        x="45"
+        y="22"
+        fontFamily="Arial, sans-serif"
+        fontSize="8"
+        fill="currentColor"
+      >
+        National Informatics Centre
+      </text>
+    </svg>
+  );
+}
+
+export function DigitalIndiaIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 120 30"
+      fill="currentColor"
+      {...props}
+    >
+      <text
+        x="0"
+        y="20"
+        fontFamily="Arial, sans-serif"
+        fontSize="20"
+        fontWeight="bold"
+      >
+        <tspan fill="#FF6F00">D</tspan>
+        <tspan fill="#000">igital </tspan>
+        <tspan fill="#00C853">I</tspan>
+        <tspan fill="#000">ndia</tspan>
+      </text>
+      <text
+        x="0"
+        y="28"
+        fontFamily="Arial, sans-serif"
+        fontSize="6"
+        fill="#000"
+      >
+        Power To Empower
+      </text>
+    </svg>
+  );
+}

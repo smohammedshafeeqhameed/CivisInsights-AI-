@@ -8,6 +8,7 @@ import { useAuth, useUser, useFirestore, errorEmitter, FirestorePermissionError 
 import { Button } from '@/components/ui/button';
 import { SealOfMaharashtra } from '@/components/icons';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { Footer } from '@/components/footer';
 
 const provider = new GoogleAuthProvider();
 
@@ -77,11 +78,15 @@ export default function LoginPage() {
     if (auth) {
       try {
         const result = await signInWithPopup(auth, provider);
-        updateUserProfile(result.user);
-        router.push('/dashboard');
+        // updateUserProfile(result.user);
+        // router.push('/dashboard');
       } catch (error: any) {
         if (error.code !== 'auth/popup-closed-by-user') {
           // General sign-in errors can still be logged
+           const user = error.customData?._tokenResponse;
+            if (user) {
+              updateUserProfile(auth.currentUser!);
+            }
         }
       }
     }
@@ -96,34 +101,37 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="relative w-full max-w-md">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
-        <div className="relative bg-card p-8 shadow-lg rounded-3xl sm:p-10 text-center">
-            <div className="mx-auto mb-6">
-                <SealOfMaharashtra className="h-24 w-24 mx-auto text-primary" />
+    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+        <main className='flex-grow flex items-center justify-center p-4'>
+            <div className="relative w-full max-w-md">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
+                <div className="relative bg-card p-8 shadow-lg rounded-3xl sm:p-10 text-center">
+                    <div className="mx-auto mb-6">
+                        <SealOfMaharashtra className="h-24 w-24 mx-auto text-primary" />
+                    </div>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                    Welcome to
+                    </h1>
+                    <h2 className="mt-2 text-4xl font-extrabold text-primary sm:text-5xl">
+                    Government of Maharashtra
+                    </h2>
+                    <p className="mt-6 text-lg text-muted-foreground">
+                    Sign in to access the CivisInsights AI dashboard.
+                    </p>
+                    <div className="mt-10">
+                        <Button
+                            onClick={handleSignIn}
+                            className="w-full text-lg"
+                            size="lg"
+                        >
+                            <GoogleIcon />
+                            <span>Sign in with Google</span>
+                        </Button>
+                    </div>
+                </div>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Welcome to
-            </h1>
-            <h2 className="mt-2 text-4xl font-extrabold text-primary sm:text-5xl">
-              Government of Maharashtra
-            </h2>
-             <p className="mt-6 text-lg text-muted-foreground">
-              Sign in to access the CivisInsights AI dashboard.
-            </p>
-            <div className="mt-10">
-                <Button
-                    onClick={handleSignIn}
-                    className="w-full text-lg"
-                    size="lg"
-                >
-                    <GoogleIcon />
-                    <span>Sign in with Google</span>
-                </Button>
-            </div>
-        </div>
-      </div>
+        </main>
+        <Footer />
     </div>
   );
 }

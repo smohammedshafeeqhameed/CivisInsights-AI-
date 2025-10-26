@@ -33,6 +33,7 @@ import { StatCard } from '@/components/dashboard/stat-card';
 import { CheckCircle2, MessageSquareWarning } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Footer } from '@/components/footer';
 
 const pieChartConfig = {
   value: { label: "Issues" },
@@ -192,7 +193,7 @@ export default function TransparencyPage() {
                 </div>
              </div>
         </main>
+        <Footer />
     </div>
   );
 }
-

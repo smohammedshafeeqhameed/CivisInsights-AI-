@@ -35,6 +35,7 @@ import { SplashScreen } from '@/components/splash-screen';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { Footer } from '@/components/footer';
 
 const formSchema = z.object({
   category: z.string({
@@ -333,6 +334,7 @@ export default function CitizenHomePage() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
