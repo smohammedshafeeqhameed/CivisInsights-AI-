@@ -29,6 +29,7 @@ import { Header } from '@/components/dashboard/header';
 import { useAuth, useUser } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { SearchProvider } from '@/hooks/use-search';
+import { Chatbot } from '@/components/dashboard/chatbot';
 
 export default function DashboardLayout({
   children,
@@ -168,7 +169,8 @@ export default function DashboardLayout({
         </Sidebar>
         <SidebarInset>
           <Header />
-          <main className="p-4 sm:p-6 lg:p-8">{children}</main>
+          <main className="relative flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+          <Chatbot />
         </SidebarInset>
       </SidebarProvider>
     </SearchProvider>
