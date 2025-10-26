@@ -2,20 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  Menu,
-  Search,
-  User,
-  LogOut,
-  Settings,
-} from 'lucide-react';
+import { Menu, Search, User, LogOut, Settings } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -29,7 +19,7 @@ import {
 import { useSidebar } from '@/components/ui/sidebar';
 import { useAuth, useUser } from '@/firebase';
 import { signOut } from 'firebase/auth';
-
+import { useSearch } from '@/hooks/use-search';
 
 export function Header() {
   const pathname = usePathname();
@@ -37,6 +27,7 @@ export function Header() {
   const { user } = useUser();
   const auth = useAuth();
   const router = useRouter();
+  const { searchTerm, setSearchTerm } = useSearch();
 
   const handleLogout = () => {
     if (auth) {
@@ -54,7 +45,7 @@ export function Header() {
       .replace(/\b\w/g, (l) => l.toUpperCase()) || 'Dashboard';
 
   return (
-    <header className="flex h-16 items-center gap-4 border-b bg-card px-4 md:px-6 sticky top-0 z-30">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-card px-4 md:px-6">
       {isMobile && (
         <Button
           variant="outline"
@@ -66,7 +57,7 @@ export function Header() {
           <span className="sr-only">Toggle navigation menu</span>
         </Button>
       )}
-      <h1 className="text-lg font-semibold md:text-xl hidden md:block">
+      <h1 className="hidden text-lg font-semibold md:block md:text-xl">
         {pageTitle}
       </h1>
 
@@ -77,7 +68,9 @@ export function Header() {
             <Input
               type="search"
               placeholder="Search issues..."
-              className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px] bg-background"
+              className="bg-background pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </form>
@@ -85,21 +78,23 @@ export function Header() {
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">
               {user?.photoURL ? (
-                  <Image
-                    src={user.photoURL}
-                    width={40}
-                    height={40}
-                    alt="User avatar"
-                    className="rounded-full"
-                  />
-                ) : (
-                  <User className="h-5 w-5" />
-                )}
+                <Image
+                  src={user.photoURL}
+                  width={40}
+                  height={40}
+                  alt="User avatar"
+                  className="rounded-full"
+                />
+              ) : (
+                <User className="h-5 w-5" />
+              )}
               <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>{user?.displayName || 'My Account'}</DropdownMenuLabel>
+            <DropdownMenuLabel>
+              {user?.displayName || 'My Account'}
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="/dashboard/profile">
