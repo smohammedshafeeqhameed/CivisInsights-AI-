@@ -10,6 +10,7 @@ import {
   Settings,
   LogOut,
   Database,
+  Users as UsersIcon,
   User as UserIcon,
 } from 'lucide-react';
 
@@ -129,6 +130,18 @@ export default function DashboardLayout({
                   <Link href="/dashboard/analytics">
                     <BarChart3 />
                     Analytics
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+                 <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === '/dashboard/users'}
+                  tooltip={{ children: 'Users' }}
+                >
+                  <Link href="/dashboard/users">
+                    <UsersIcon />
+                    Users
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
