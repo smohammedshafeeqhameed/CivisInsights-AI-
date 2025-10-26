@@ -10,6 +10,7 @@ import {
   Settings,
   LogOut,
   Database,
+  User as UserIcon,
 } from 'lucide-react';
 
 import {
@@ -127,9 +128,17 @@ export default function DashboardLayout({
         </SidebarContent>
         <SidebarFooter>
           <SidebarMenu>
+             <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={pathname === '/dashboard/profile'} tooltip={{ children: 'Profile' }}>
+                <Link href="/dashboard/profile">
+                  <UserIcon />
+                  Profile
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={{ children: 'Settings' }}>
-                <Link href="#">
+              <SidebarMenuButton asChild isActive={pathname === '/dashboard/settings'} tooltip={{ children: 'Settings' }}>
+                <Link href="/dashboard/settings">
                   <Settings />
                   Settings
                 </Link>
