@@ -34,6 +34,7 @@ import Link from 'next/link';
 import { SplashScreen } from '@/components/splash-screen';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
+import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 const formSchema = z.object({
   category: z.string({
@@ -133,14 +134,7 @@ export default function CitizenHomePage() {
       role: 'public', // Assign 'public' role for citizen login
     };
     
-    setDoc(userRef, userData, { merge: true }).catch(serverError => {
-        const permissionError = new FirestorePermissionError({
-            path: userRef.path,
-            operation: 'write',
-            requestResourceData: userData
-        });
-        errorEmitter.emit('permission-error', permissionError);
-    });
+    setDocumentNonBlocking(userRef, userData, { merge: true });
   }
 
   const handleSignIn = async () => {
@@ -151,7 +145,6 @@ export default function CitizenHomePage() {
         toast({ title: 'Successfully signed in!' });
       } catch (error: any) {
         if (error.code !== 'auth/popup-closed-by-user') {
-          console.error('Error signing in with Google:', error);
           toast({ variant: 'destructive', title: 'Sign-in failed', description: 'Could not sign in with Google. Please try again.' });
         }
       }

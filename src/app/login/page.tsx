@@ -7,6 +7,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { useAuth, useUser, useFirestore, errorEmitter, FirestorePermissionError } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { SealOfMaharashtra } from '@/components/icons';
+import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 const provider = new GoogleAuthProvider();
 
@@ -68,15 +69,8 @@ export default function LoginPage() {
       role: 'admin', // Assign 'admin' role for official login
     };
     
-    // Use setDoc with a .catch() block for error handling
-    setDoc(userRef, userData, { merge: true }).catch(serverError => {
-        const permissionError = new FirestorePermissionError({
-            path: userRef.path,
-            operation: 'write',
-            requestResourceData: userData
-        });
-        errorEmitter.emit('permission-error', permissionError);
-    });
+    // Use the non-blocking update function with improved error handling
+    setDocumentNonBlocking(userRef, userData, { merge: true });
   }
 
   const handleSignIn = async () => {
@@ -87,7 +81,7 @@ export default function LoginPage() {
         router.push('/dashboard');
       } catch (error: any) {
         if (error.code !== 'auth/popup-closed-by-user') {
-          console.error('Error signing in with Google:', error);
+          // General sign-in errors can still be logged
         }
       }
     }
