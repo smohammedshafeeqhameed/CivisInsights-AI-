@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -18,7 +19,8 @@ const SummarizeCitizenIssueInputSchema = z.object({
   issueCategory: z
     .string()
     .describe(
-      'The category of the reported issue (e.g., road maintenance, public safety, sanitation).'n    ),
+      'The category of the reported issue (e.g., road maintenance, public safety, sanitation).'
+    ),
 });
 
 export type SummarizeCitizenIssueInput = z.infer<
@@ -26,13 +28,13 @@ export type SummarizeCitizenIssueInput = z.infer<
 >;
 
 const SummarizeCitizenIssueOutputSchema = z.object({
-  summary: z.string().describe('A concise summary of the citizen-reported issue.'),
+  summary: z.string().describe('A concise, one-sentence summary of the citizen-reported issue.'),
   keyDetails: z
     .array(z.string())
-    .describe('Key details extracted from the issue report.'),
+    .describe('A list of 2-3 bullet points extracting the most critical details from the issue report (e.g., specific locations, times, items).'),
   suggestedAction: z
     .string()
-    .describe('A suggested action based on the issue summary.'),
+    .describe('A brief, actionable suggestion for the next step to resolve the issue.'),
 });
 
 export type SummarizeCitizenIssueOutput = z.infer<
@@ -49,14 +51,12 @@ const summarizeCitizenIssuePrompt = ai.definePrompt({
   name: 'summarizeCitizenIssuePrompt',
   input: {schema: SummarizeCitizenIssueInputSchema},
   output: {schema: SummarizeCitizenIssueOutputSchema},
-  prompt: `You are a city official tasked with summarizing citizen-reported issues. Your goal is to provide a concise summary of the issue, extract key details, and suggest a course of action.
+  prompt: `You are a city official tasked with summarizing citizen-reported issues. Your goal is to provide a concise summary, extract key details, and suggest a course of action. Analyze the report and provide the output in the required structured format.
 
   Issue Category: {{{issueCategory}}}
   Issue Report: {{{issueReport}}}
-
-  Summary:
-  Key Details:
-  Suggested Action:`,
+  
+  Generate a one-sentence summary, a list of 2-3 key details, and a brief suggested action.`,
 });
 
 const summarizeCitizenIssueFlow = ai.defineFlow(
