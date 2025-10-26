@@ -23,7 +23,6 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import { Logo } from '@/components/icons';
-import { Button } from '@/components/ui/button';
 import { Header } from '@/components/dashboard/header';
 import { useAuth, useUser } from '@/firebase';
 import { signOut } from 'firebase/auth';
@@ -38,17 +37,21 @@ export default function DashboardLayout({
   const router = useRouter();
 
   useEffect(() => {
+    // If auth state is resolved and there's no user, redirect to login
     if (!isUserLoading && !user) {
-      router.push('/login');
+      router.replace('/login');
     }
   }, [user, isUserLoading, router]);
 
   const handleLogout = () => {
     if (auth) {
       signOut(auth);
+      // The user state will change, and the effect above will redirect to login.
     }
   };
   
+  // While loading or if no user, show a loading spinner.
+  // This prevents a flash of the dashboard content before redirection.
   if (isUserLoading || !user) {
     return (
       <div className="flex h-screen w-screen items-center justify-center">

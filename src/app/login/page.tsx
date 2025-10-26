@@ -39,8 +39,10 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
+    // If user is already logged in, redirect to dashboard.
+    // This is a fallback, main logic is in /src/app/page.tsx
     if (!isUserLoading && user) {
-      router.push('/dashboard');
+      router.replace('/dashboard');
     }
   }, [user, isUserLoading, router]);
 
@@ -48,10 +50,8 @@ export default function LoginPage() {
     if (auth) {
       try {
         await signInWithPopup(auth, provider);
-        router.push('/dashboard');
+        // On successful sign-in, the useEffect hook will trigger the redirect.
       } catch (error: any) {
-        // This specific error code means the user closed the popup.
-        // It's a normal user action, so we can safely ignore it.
         if (error.code !== 'auth/popup-closed-by-user') {
           console.error('Error signing in with Google:', error);
         }
@@ -59,6 +59,7 @@ export default function LoginPage() {
     }
   };
 
+  // While checking auth status or if user is already logged in, show a loading state.
   if (isUserLoading || user) {
     return (
       <div className="flex h-screen w-screen items-center justify-center">
