@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -10,30 +11,39 @@ import { StatCard } from '@/components/dashboard/stat-card';
 import { RecentIssues } from '@/components/dashboard/recent-issues';
 import { DemandPrediction } from '@/components/dashboard/demand-prediction';
 import { GovernanceInsights } from '@/components/dashboard/governance-insights';
-import { stats } from '@/lib/data';
+import { issues } from '@/lib/data';
 
 export default function DashboardPage() {
+  const newIssues = issues.filter((issue) => issue.status === 'New').length;
+  const resolvedToday = issues.filter(
+    (issue) => issue.status === 'Resolved'
+  ).length;
+  const pendingReview = issues.filter(
+    (issue) => issue.status === 'In Progress'
+  ).length;
+  const avgResolutionTime = '2.1 days'; // Static for now
+
   return (
     <div className="flex flex-col gap-8">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="New Issues"
-          value={stats.newIssues}
+          value={newIssues}
           icon={MessageSquareWarning}
         />
         <StatCard
-          title="Resolved Today"
-          value={stats.resolvedToday}
+          title="Resolved Issues"
+          value={resolvedToday}
           icon={CheckCircle2}
         />
         <StatCard
           title="Pending Review"
-          value={stats.pendingReview}
+          value={pendingReview}
           icon={Hourglass}
         />
         <StatCard
           title="Avg. Resolution Time"
-          value={stats.avgResolutionTime}
+          value={avgResolutionTime}
           icon={Clock}
         />
       </div>
