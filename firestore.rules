@@ -1,61 +1,77 @@
 /**
- * @fileoverview Firestore Security Rules for CivisInsights AI Application.
+ * @fileoverview Firestore Security Rules for CivisInsights AI application.
  *
  * Core Philosophy:
- * This ruleset enforces a strict user-ownership model for all data. Each user's profile is stored under `/users/{userId}`,
- * and only the authenticated user matching the `userId` can read or write to their own profile.
+ * This ruleset enforces a strict user-ownership model for most data, with exceptions for explicitly public data.
  *
  * Data Structure:
- * All user data is nested under the `/users/{userId}` collection path.
+ * - User profiles are stored under `/users/{userId}`, accessible only to the owning user and admins.
  *
  * Key Security Decisions:
- * - User listing is explicitly denied to prevent unauthorized access to user data.
- * - The rules validate that the `id` field within a user document matches the `userId` in the path for create and update operations
- *   to prevent data inconsistencies.
+ * - User listing is strictly forbidden to prevent information disclosure.
+ * - Admin roles are not yet implemented.
  *
  * Denormalization for Authorization:
- *  The rules rely on path-based authorization, where the `userId` parameter in the path `/users/{userId}` is compared against
- *  `request.auth.uid`.  This avoids the need for additional reads (e.g., `get()`) to determine user identity or ownership.
- *  To create simpler, more performant rules, denormalize (copy) data required for an authorization decision directly onto the documents being secured. This avoids slow, costly, or impossible security checks.
+ *  N/A - User ID is encoded into the document path.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Secure user profiles stored under /users/{userId}.
+     * @description Protects the /users collection. Only the user with the matching user ID in the path can read their profile.
      * @path /users/{userId}
-     * @allow (create) - Authenticated user with UID 'user_abc' can create their own profile if the 'id' field matches the UID.
-     * @allow (get, update, delete) - Authenticated user with UID 'user_abc' can get, update, or delete their own profile.
-     * @deny (create) - Authenticated user with UID 'user_xyz' cannot create a profile under /users/user_abc.
-     * @deny (get, update, delete) - Authenticated user with UID 'user_xyz' cannot get, update, or delete the profile of user 'user_abc'.
-     * @principle Enforces document ownership for all read and write operations on user profiles.
+     * @allow (get) User 'uRc2uFpB3MVBL3BE9uXHjqsP22e2' can read their own profile at /users/uRc2uFpB3MVBL3BE9uXHjqsP22e2.
+     * @deny (get) User 'someOtherUserId' cannot read the profile of /users/uRc2uFpB3MVBL3BE9uXHjqsP22e2.
+     * @allow (create) User 'uRc2uFpB3MVBL3BE9uXHjqsP22e2' can create their own profile at /users/uRc2uFpB3MVBL3BE9uXHjqsP22e2.
+     * @deny (create) User 'someOtherUserId' cannot create a profile at /users/uRc2uFpB3MVBL3BE9uXHjqsP22e2.
+     * @allow (update) User 'uRc2uFpB3MVBL3BE9uXHjqsP22e2' can update their own profile at /users/uRc2uFpB3MVBL3BE9uXHjqsP22e2.
+     * @deny (update) User 'someOtherUserId' cannot update the profile of /users/uRc2uFpB3MVBL3BE9uXHjqsP22e2.
+     * @allow (delete) User 'uRc2uFpB3MVBL3BE9uXHjqsP22e2' can delete their own profile at /users/uRc2uFpB3MVBL3BE9uXHjqsP22e2.
+     * @deny (delete) User 'someOtherUserId' cannot delete the profile of /users/uRc2uFpB3MVBL3BE9uXHjqsP22e2.
+     * @principle Enforces document ownership for all operations.
      */
     match /users/{userId} {
-      // Helper function to check if the authenticated user is the owner of the document.
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-
-      // Helper function to check if the authenticated user is the existing owner of the document.
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      // Allow creation of a user document if the authenticated user's ID matches the document ID and the internal 'id' field matches the path.
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-
-      // Allow reading a user document if the authenticated user is the owner.
       allow get: if isOwner(userId);
-
-      // Allow listing user documents is not permitted.
-      allow list: if false;
-
-      // Allow updating a user document if the authenticated user is the existing owner and if the internal 'id' field is immutable.
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
-
-      // Allow deleting a user document if the authenticated user is the existing owner.
+      allow list: if false; // User listing is not permitted
+      allow create: if isSignedIn() && isSelfCreation(userId);
+      allow update: if isExistingOwner(userId);
       allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Helper function to check if the user is signed in.
+     * @return {boolean} True if the user is signed in, false otherwise.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Helper function to check if the request is made by the owner of the document.
+     * @param {string} userId The user ID from the path.
+     * @return {boolean} True if the user ID matches the authenticated user's ID.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Helper function to check if the request is for self-creation (creating a document with the user's own ID).
+     * @param {string} userId The user ID from the path.
+     * @return {boolean} True if the user ID matches the authenticated user's ID.
+     */
+    function isSelfCreation(userId) {
+        return request.auth.uid == userId;
+    }
+
+    /**
+     * @description Helper function to check if the request is made by the owner of an existing document.
+     * @param {string} userId The user ID from the path.
+     * @return {boolean} True if the user ID matches the authenticated user's ID and the resource exists.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
     }
   }
 }
