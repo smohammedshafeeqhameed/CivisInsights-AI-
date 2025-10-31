@@ -57,8 +57,9 @@ export default function DashboardLayout({
 
   const handleLogout = () => {
     if (auth) {
-      signOut(auth);
-      // The user state will change, and the effect above will redirect to login.
+      signOut(auth).then(() => {
+        router.push('/');
+      });
     }
   };
 

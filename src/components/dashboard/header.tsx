@@ -32,7 +32,7 @@ export function Header() {
   const handleLogout = () => {
     if (auth) {
       signOut(auth).then(() => {
-        router.push('/login');
+        router.push('/');
       });
     }
   };
