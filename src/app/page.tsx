@@ -154,7 +154,9 @@ export default function CitizenHomePage() {
 
   const handleLogout = () => {
     if (auth) {
-      signOut(auth);
+      signOut(auth).then(() => {
+        toast({ title: 'Successfully signed out!' });
+      });
     }
   }
 
