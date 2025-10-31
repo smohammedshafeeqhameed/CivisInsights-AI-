@@ -156,6 +156,7 @@ export default function CitizenHomePage() {
     if (auth) {
       signOut(auth).then(() => {
         toast({ title: 'Successfully signed out!' });
+        window.location.reload();
       });
     }
   }
