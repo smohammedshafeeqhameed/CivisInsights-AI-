@@ -3,12 +3,13 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { GoogleAuthProvider, signInWithPopup, User } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { useAuth, useUser, useFirestore, errorEmitter, FirestorePermissionError } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { useAuth, useUser, useFirestore } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { SealOfMaharashtra } from '@/components/icons';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { Footer } from '@/components/footer';
+import { useToast } from '@/hooks/use-toast';
 
 const provider = new GoogleAuthProvider();
 
@@ -41,6 +42,7 @@ export default function LoginPage() {
   const firestore = useFirestore();
   const { user, profile, isUserLoading } = useUser();
   const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!isUserLoading && user && profile) {
@@ -78,15 +80,16 @@ export default function LoginPage() {
     if (auth) {
       try {
         const result = await signInWithPopup(auth, provider);
-        // updateUserProfile(result.user);
-        // router.push('/dashboard');
+        updateUserProfile(result.user);
+        toast({ title: "Sign in successful!", description: "Redirecting to dashboard..." });
       } catch (error: any) {
         if (error.code !== 'auth/popup-closed-by-user') {
-          // General sign-in errors can still be logged
-           const user = error.customData?._tokenResponse;
-            if (user) {
-              updateUserProfile(auth.currentUser!);
-            }
+          console.error("Sign-in error:", error);
+          toast({
+            variant: "destructive",
+            title: "Sign-in failed",
+            description: error.message || "An unexpected error occurred during sign-in.",
+          });
         }
       }
     }
